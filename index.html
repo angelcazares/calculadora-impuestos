@@ -22,7 +22,7 @@
         <!-- Agrega el panel oculto con los pasos del cálculo -->
         <div class="mt-3">
             <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#pasosCalculo">
-                <i class="fas fa-info-circle"></i> Ver Pasos de Cálculo
+                <i class="fas fa-info-circle"></i> Ver Pasos de C&aacute;lculo
             </button>
             <div id="pasosCalculo" class="collapse mt-3">
                 <h4 class="text-center">Pasos de C&aacute;lculo:</h4>
@@ -77,7 +77,7 @@
             }
 
             const resultadoElement = document.getElementById('resultado');
-            resultadoElement.textContent = `Traslado de dominio: $${calculoFinal.toFixed(2)}`;
+            resultadoElement.textContent = `Traslado de dominio: $${calculoFinal.toLocaleString()}`;
 
             // Mostrar pasos de cálculo
             const pasosLista = document.getElementById('tablaRangos');
@@ -86,9 +86,9 @@
                 return `
                     <tr class="${selected}">
                         <td>${rango.numero}</td>
-                        <td>${rango.inferior}</td>
-                        <td>${rango.superior}</td>
-                        <td>${rango.cuota}</td>
+                        <td>${rango.inferior.toLocaleString()}</td>
+                        <td>${rango.superior.toLocaleString()}</td>
+                        <td>${rango.cuota.toLocaleString()}</td>
                         <td>${rango.cifra}</td>
                     </tr>
                 `;
@@ -96,11 +96,11 @@
 
 
             const resultHtml = `
-                <p><strong>1. El valor de inmueble cae en el rango de</strong> ${rangoSeleccionado.inferior} a ${rangoSeleccionado.superior}.</p>
-                <p><strong>2. Diferencia desde el límite inferior del rango:</strong> ${valorInmueble} - ${rangoSeleccionado.inferior} = ${diferencia.toFixed(2)}.</p>
-                <p><strong>3. Multiplicamos la diferencia por la cifra sobre el excedente del límite inferior:</strong> ${diferencia.toFixed(2)} *  ${rangoSeleccionado.cifra} =  ${diferenciaPorExcedente.toFixed(2)}</p>
-                <p><strong>4. Sumamos la cuota en pesos:</strong> ${diferenciaPorExcedente.toFixed(2)} + ${rangoSeleccionado.cuota} = ${calculoFinal.toFixed(2)}</p>
-                <p>TOTAL del traslado de dominio: $${calculoFinal.toFixed(2)}</p>
+                <p><strong>1. El valor de inmueble cae en el rango de</strong> ${rangoSeleccionado.inferior.toLocaleString()} a ${rangoSeleccionado.superior.toLocaleString()}.</p>
+                <p><strong>2. Diferencia desde el l&iacute;mite inferior del rango:</strong> ${valorInmueble.toLocaleString()} - ${rangoSeleccionado.inferior.toLocaleString()} = ${diferencia.toFixed(2)}.</p>
+                <p><strong>3. Multiplicamos la diferencia por la cifra sobre el excedente del l&iacute;mite inferior:</strong> ${diferencia.toFixed(2)} *  ${rangoSeleccionado.cifra} =  ${diferenciaPorExcedente.toFixed(2)}</p>
+                <p><strong>4. Sumamos la cuota en pesos:</strong> ${diferenciaPorExcedente.toFixed(2)} + ${rangoSeleccionado.cuota.toLocaleString()} = ${calculoFinal.toFixed(2)}</p>
+                <p><strong>TOTAL del traslado de dominio: $${calculoFinal.toLocaleString()}</strong></p>
             `;
 
             document.getElementById('pasoRango').innerHTML = resultHtml;
