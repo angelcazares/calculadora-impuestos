@@ -7,23 +7,54 @@
     <!-- Agrega los enlaces a los estilos de Bootstrap y Font Awesome -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css">
+    <style>
+        .highlight {
+            background-color: #f3f3f3;
+            /* Cambia el color de resaltado aquí */
+        }
+
+        .footer {
+            font-style: italic;
+            font-size: 12px;
+            color: gray;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Calculadora de Impuestos</h1>
         <div class="form-group">
-            <label for="valorInmueble">Ingrese el valor del inmueble:</label>
-            <input type="number" id="valorInmueble" class="form-control" inputmode="decimal" pattern="[0-9]*">
+            <label for="valorOperacionAntes">Valor de operaci&oacute;n:</label>
+            <input type="number" id="valorOperacionAntes" class="form-control" inputmode="decimal" pattern="[0-9]*">
+        </div>
+        <div class="form-group">
+            <label for="valorAvaluoFiscal">Valor de aval&uacute;o fiscal:</label>
+            <input type="number" id="valorAvaluoFiscal" class="form-control" inputmode="decimal" pattern="[0-9]*">
+        </div>
+        <div class="form-group">
+            <label for="valorHonorarios">Honorarios:</label>
+            <input type="number" id="valorHonorarios" class="form-control" inputmode="decimal" pattern="[0-9]*">
         </div>
         <button class="btn btn-primary btn-block" onclick="calcularImpuesto()">Calcular Impuesto</button>
-        <p id="resultado" class="text-center mt-3"></p>
-
         <!-- Agrega el panel oculto con los pasos del cálculo -->
+
+        <hr>
+        <div class="form-group">
+            <label for="transferTax">Traslado de Dominio:</label>
+            <div class="input-group">
+                <span class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                </span>
+                <input type="text" id="transferTax" class="form-control" readonly>
+            </div>
+        </div>
         <div class="mt-3">
-            <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#pasosCalculo">
-                <i class="fas fa-info-circle"></i> Ver Pasos de C&aacute;lculo
-            </button>
+            <div style="text-align: right;">
+                <a href="#pasosCalculo" data-toggle="collapse">
+                    <i class="fas fa-info-circle" style="margin-right: 10px;">Ver pasos del c&aacute;lculo</i>
+                </a>
+            </div>
             <div id="pasosCalculo" class="collapse mt-3">
                 <h4 class="text-center">Pasos de C&aacute;lculo:</h4>
                 <div>
@@ -44,11 +75,53 @@
                 </div>
             </div>
         </div>
+        <div class="form-group">
+            <label for="registroPublico">Registro publico de la propiedad:</label>
+            <div class="input-group">
+                <span class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                </span>
+                <input type="text" id="registroPublico" class="form-control" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="avisoDefinitivo">Aviso definitivo:</label>
+            <div class="input-group">
+                <span class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                </span>
+                <input type="text" id="avisoDefinitivo" class="form-control" readonly>
+            </div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <label for="total">TOTAL:</label>
+            <div class="input-group">
+                <input type="text" id="total" class="form-control text-right highlight" readonly>
+                <span class="input-group-append">
+                    <span class="input-group-text">$</span>
+                </span>
+            </div>
+            <p class="footer" id="totalFooter">C&aacute;lculo SIN honorarios</p>
+        </div>
+
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle mr-2"></i>
+            Falta agregar el valor del Avaluo
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
     </div>
     <script>
 
         function calcularImpuesto() {
-            const valorInmueble = parseFloat(document.getElementById('valorInmueble').value);
+            const avisoDefinitivo = 207;
+            const valorOperacionAntes = parseFloat(document.getElementById('valorOperacionAntes').value);
+            const valorAvaluoFiscal = parseFloat(document.getElementById('valorAvaluoFiscal').value);
+            const honorarios = parseFloat(document.getElementById('valorHonorarios').value || 0);
+
             const rangos = [
                 { numero: 1, inferior: 0.00, superior: 81611.20, cuota: 0.00, cifra: 0.03999999197 },
                 { numero: 2, inferior: 81611.21, superior: 143307.72, cuota: 3264.45, cifra: 0.04476282369 },
@@ -63,21 +136,21 @@
             let rangoSeleccionado = null;
             let diferencia = 0;
             let diferenciaPorExcedente = 0;
-            let calculoFinal = 0;
+            let trasladoDominioCalculoFinal = 0;
 
             for (const rango of rangos) {
-                if (valorInmueble >= rango.inferior && valorInmueble <= rango.superior) {
+                if (valorOperacionAntes >= rango.inferior && valorOperacionAntes <= rango.superior) {
                     rangoSeleccionado = rango;
 
-                    diferencia = valorInmueble - rango.inferior;
+                    diferencia = valorOperacionAntes - rango.inferior;
                     diferenciaPorExcedente = diferencia * rango.cifra;
-                    calculoFinal = diferenciaPorExcedente + rango.cuota;
+                    trasladoDominioCalculoFinal = diferenciaPorExcedente + rango.cuota;
                     break;
                 }
             }
 
-            const resultadoElement = document.getElementById('resultado');
-            resultadoElement.textContent = `Traslado de dominio: $${calculoFinal.toLocaleString()}`;
+            const transferTaxInput = document.getElementById('transferTax');
+            transferTaxInput.value = trasladoDominioCalculoFinal.toLocaleString();
 
             // Mostrar pasos de cálculo
             const pasosLista = document.getElementById('tablaRangos');
@@ -97,16 +170,46 @@
 
             const resultHtml = `
                 <p><strong>1. El valor de inmueble cae en el rango de</strong> ${rangoSeleccionado.inferior.toLocaleString()} a ${rangoSeleccionado.superior.toLocaleString()}.</p>
-                <p><strong>2. Diferencia desde el l&iacute;mite inferior del rango:</strong> ${valorInmueble.toLocaleString()} - ${rangoSeleccionado.inferior.toLocaleString()} = ${diferencia.toFixed(2)}.</p>
+                <p><strong>2. Diferencia desde el l&iacute;mite inferior del rango:</strong> ${valorOperacionAntes.toLocaleString()} - ${rangoSeleccionado.inferior.toLocaleString()} = ${diferencia.toFixed(2)}.</p>
                 <p><strong>3. Multiplicamos la diferencia por la cifra sobre el excedente del l&iacute;mite inferior:</strong> ${diferencia.toFixed(2)} *  ${rangoSeleccionado.cifra} =  ${diferenciaPorExcedente.toFixed(2)}</p>
-                <p><strong>4. Sumamos la cuota en pesos:</strong> ${diferenciaPorExcedente.toFixed(2)} + ${rangoSeleccionado.cuota.toLocaleString()} = ${calculoFinal.toFixed(2)}</p>
-                <p><strong>TOTAL del traslado de dominio: $${calculoFinal.toLocaleString()}</strong></p>
+                <p><strong>4. Sumamos la cuota en pesos:</strong> ${diferenciaPorExcedente.toFixed(2)} + ${rangoSeleccionado.cuota.toLocaleString()} = ${trasladoDominioCalculoFinal.toFixed(2)}</p>
+                <p><strong>TOTAL del traslado de dominio: $${trasladoDominioCalculoFinal.toLocaleString()}</strong></p>
             `;
 
             document.getElementById('pasoRango').innerHTML = resultHtml;
+
+
+            // CALCULO DERECHOS REGISTRO PUBLICO
+
+            const factorMillares = valorAvaluoFiscal / 1000;
+            const pagoDerechos = factorMillares * 7.5;
+
+            const registroPublicoInput = document.getElementById('registroPublico');
+            registroPublicoInput.value = pagoDerechos.toLocaleString();
+
+            const avisoDefinitivoInput = document.getElementById('avisoDefinitivo');
+            avisoDefinitivoInput.value = avisoDefinitivo.toLocaleString();
+
+            var impuestoTotal = trasladoDominioCalculoFinal + pagoDerechos + avisoDefinitivo + honorarios;
+
+            const totalInput = document.getElementById('total');
+            totalInput.value = impuestoTotal.toLocaleString();
         }
 
+        const valorHonorariosInput = document.getElementById('valorHonorarios');
+        const totalInput = document.getElementById('total');
+        const totalFooter = document.getElementById('totalFooter');
 
+        valorHonorariosInput.addEventListener('input', () => {
+            const valorHonorarios = parseFloat(valorHonorariosInput.value);
+            if (isNaN(valorHonorarios) || valorHonorarios === 0) {
+                totalFooter.textContent = 'Calculo SIN honorarios';
+                totalInput.value = '';
+            } else {
+                totalFooter.textContent = '';
+                // Agregar aquí la lógica para calcular y mostrar el total en el campo de entrada "total"
+            }
+        });
     </script>
     <!-- Agrega los enlaces a los scripts de Bootstrap y Font Awesome -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
